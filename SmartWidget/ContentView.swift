@@ -3,12 +3,18 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Spacer()
+
+            VStack {
+                WidgetWelcomeView()
+            }
+            .aspectRatio(1.0, contentMode: .fit)
+
+            Spacer()
+            WidgetToolbar()
         }
-        .padding()
+        .padding(.horizontal, 15)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
     }
 }
 
