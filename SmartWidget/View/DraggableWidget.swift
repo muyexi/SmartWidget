@@ -1,30 +1,32 @@
 import SwiftUI
 
 struct DraggableWidget: View {
-    let color: Color
-    @Binding var offset: CGSize
-    var onDrop: (Color, CGPoint) -> Void
+    @Binding var widget: Widget
+    var onDrag: (Widget) -> Void
 
     var body: some View {
         ZStack {
-            if offset != .zero {
+            if widget.offset != .zero {
                 Circle()
-                    .stroke(color.opacity(0.8), style: StrokeStyle(lineWidth: 2, dash: [6, 6]))
+                    .stroke(widget.color.opacity(0.8), style: StrokeStyle(lineWidth: 2, dash: [6, 6]))
                     .frame(width: 50, height: 50)
             }
 
-            color
+            widget.color
                 .frame(width: 50, height: 50)
                 .clipShape(Capsule())
-                .offset(offset)
+                .offset(widget.offset)
                 .gesture(
                     DragGesture()
                         .onChanged { value in
-                            offset = value.translation
+                            widget.offset = value.translation
+                            widget.coordinate = value.location
+                            onDrag(widget)
                         }
                         .onEnded { value in
-                            onDrop(color, value.location)
-                            offset = .zero
+                            widget.offset = .zero
+                            widget.coordinate = value.location
+                            onDrag(widget)
                         }
                 )
         }
@@ -33,11 +35,11 @@ struct DraggableWidget: View {
 
 
 #Preview {
-    @Previewable @State var offset: CGSize = .zero
+    @Previewable @State var widget = Widget(id: 0, color: .red, coordinate: .zero, offset: .zero)
 
     Group {
-        DraggableWidget(color: .red, offset: $offset, onDrop: { _, point in
-            print("Point: \(point)")
+        DraggableWidget(widget: $widget, onDrag: { widget in
+            print("Point: \(widget.coordinate)")
         })
         .frame(width: 180, height: 180)
     }

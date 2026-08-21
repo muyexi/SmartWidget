@@ -1,29 +1,24 @@
 import SwiftUI
 
 struct WidgetToolbar: View {
-    let colors: [Color] = [
-        .skyBlue,
-        .hotPink,
-        .brightYellow,
-        .limeGreen,
-        .vibrantOrange
-    ]
+    @State private var widgets: [Widget]
+    var onDrag: (Widget) -> Void
     
-    @State private var offsets: [CGSize] = []
-    var onDrop: (Color, CGPoint) -> Void
-    
-    init(onDrop: @escaping (Color, CGPoint) -> Void = { _,_ in }) {
-        self.onDrop = onDrop
-        _offsets = State(initialValue: Array(repeating: .zero, count: colors.count))
+    init(
+        widgets: [Widget] = Widget.toolbarItems,
+        onDrag: @escaping (Widget) -> Void = { _ in }
+    ) {
+        self.onDrag = onDrag
+        _widgets = State(initialValue: widgets)
     }
 
     var body: some View {
         HStack {
-            ForEach(colors.indices, id: \.self) { index in
-                DraggableWidget(color: colors[index], offset: $offsets[index], onDrop: onDrop)
+            ForEach(widgets.indices, id: \.self) { index in
+                DraggableWidget(widget: $widgets[index], onDrag: onDrag)
                 
                 // Add equal spacing between elements.
-                if index < colors.count - 1 {
+                if index < widgets.count - 1 {
                     Spacer()
                 }
             }
