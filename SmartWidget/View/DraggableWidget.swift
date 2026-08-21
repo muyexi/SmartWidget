@@ -4,9 +4,13 @@ struct DraggableWidget: View {
     @Binding var widget: Widget
     var onDrag: (Widget) -> Void
 
+    private var isDragging: Bool {
+        widget.offset != .zero
+    }
+
     var body: some View {
         ZStack {
-            if widget.offset != .zero {
+            if isDragging {
                 Circle()
                     .stroke(widget.color.opacity(0.8), style: StrokeStyle(lineWidth: 2, dash: [6, 6]))
                     .frame(width: 50, height: 50)
@@ -15,6 +19,7 @@ struct DraggableWidget: View {
             widget.color
                 .frame(width: 50, height: 50)
                 .clipShape(Capsule())
+                .appShadow(isDragging)
                 .offset(widget.offset)
                 .gesture(
                     DragGesture()
