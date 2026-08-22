@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DraggableWidgetView: View {
     @Binding var widget: Widget
+    let isPreviewing: Bool
 
     var onDrag: (Widget) -> Void = { _ in }
     var onDrop: (Widget) -> Void = { _ in }
@@ -21,6 +22,7 @@ struct DraggableWidgetView: View {
                 .clipShape(Capsule())
                 .appShadow(isDragging)
                 .offset(widget.offset)
+                .opacity(isDragging && isPreviewing ? 0 : 1)
                 .gesture(
                     DragGesture(coordinateSpace: .global)
                         .onChanged { value in
@@ -45,6 +47,7 @@ struct DraggableWidgetView: View {
 
     DraggableWidgetView(
         widget: $widget,
+        isPreviewing: false,
         onDrag: { print("dragging at \($0.coordinate)") },
         onDrop: { print("dropped at \($0.coordinate)") }
     )

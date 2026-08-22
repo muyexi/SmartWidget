@@ -30,7 +30,11 @@ struct ContentView: View {
 
             Spacer()
 
-            WidgetToolbar(onDrag: previewDrop, onDrop: commitDrop)
+            WidgetToolbar(
+                isPreviewing: pendingDrop != nil,
+                onDrag: previewDrop,
+                onDrop: commitDrop
+            )
         }
         .padding(.horizontal, 15)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
