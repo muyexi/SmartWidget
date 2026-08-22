@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct DraggableWidget: View {
+struct DraggableWidgetView: View {
     @Binding var widget: Widget
 
     var onDrag: (Widget) -> Void = { _ in }
@@ -43,7 +43,7 @@ struct DraggableWidget: View {
 #Preview {
     @Previewable @State var widget = Widget(id: 0, color: .red, coordinate: .zero, offset: .zero)
 
-    DraggableWidget(
+    DraggableWidgetView(
         widget: $widget,
         onDrag: { print("dragging at \($0.coordinate)") },
         onDrop: { print("dropped at \($0.coordinate)") }

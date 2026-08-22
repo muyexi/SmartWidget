@@ -18,7 +18,7 @@ struct WidgetToolbar: View {
     var body: some View {
         HStack {
             ForEach(widgets.indices, id: \.self) { index in
-                DraggableWidget(widget: $widgets[index], onDrag: onDrag, onDrop: onDrop)
+                DraggableWidgetView(widget: $widgets[index], onDrag: onDrag, onDrop: onDrop)
 
                 // Add equal spacing between elements.
                 if index < widgets.count - 1 {
