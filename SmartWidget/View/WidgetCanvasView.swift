@@ -1,30 +1,56 @@
 import SwiftUI
 
 struct WidgetCanvasView: View {
-    let instances: [WidgetInstance]
+    let layout: WidgetLayout
 
     private let spacing: CGFloat = 5
-    private let cornerRadius: CGFloat = 24
+    private let cornerRadius: CGFloat = 36
 
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .topLeading) {
-                ForEach(Array(instances.enumerated()), id: \.element.id) { index, widget in
-                    widget.color
-                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-                        .appShadow()
-                        .frame(width: instances[index].frame.width, height: instances[index].frame.height)
-                        .position(x: instances[index].frame.midX, y: instances[index].frame.midY)
+                if layout.isEmpty {
+                    WidgetWelcomeView()
+                        .transition(.opacity.combined(with: .scale(scale: 0.97)))
+                }
+
+                ForEach(layout.placements(in: proxy.size, spacing: spacing)) { placement in
+                    tile(placement)
                 }
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
         }
-        .animation(.spring(response: 0.45, dampingFraction: 0.82), value: instances.count)
+        .animation(.spring(response: 0.45, dampingFraction: 0.82), value: layout)
+    }
+
+    private func tile(_ placement: WidgetLayout.Placement) -> some View {
+        let radius = min(cornerRadius, min(placement.frame.width, placement.frame.height) / 2)
+        let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
+
+        return shape
+            .fill(placement.widget.color)
+            .frame(width: placement.frame.width, height: placement.frame.height)
+            .appShadow()
+            // Applied before .position so the tile scales about its own centre rather than the canvas.
+            .transition(.scale(scale: 0.86).combined(with: .opacity))
+            .position(x: placement.frame.midX, y: placement.frame.midY)
+            .accessibilityElement()
+            .accessibilityIdentifier("canvas.tile")
     }
 }
 
-#Preview {
-    WidgetCanvasView(instances: [.init(color: .skyBlue, frame: .init(x: 0, y: 0, width: 300, height: 300))])
-        .frame(width: 300, height: 300)
+#Preview("Empty") {
+    WidgetCanvasView(layout: WidgetLayout())
+        .frame(width: 320, height: 320)
+        .padding()
+}
+
+#Preview("Committed layout") {
+    let a = WidgetInstance(color: .skyBlue)
+    let b = WidgetInstance(color: .hotPink)
+    let c = WidgetInstance(color: .limeGreen)
+
+    return WidgetCanvasView(layout: WidgetLayout(rows: [[a, b], [c]]))
+        .frame(width: 320, height: 320)
         .padding()
 }

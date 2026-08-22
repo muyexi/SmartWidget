@@ -2,7 +2,9 @@ import SwiftUI
 
 struct DraggableWidget: View {
     @Binding var widget: Widget
-    var onDrag: (Widget) -> Void
+
+    var onDrag: (Widget) -> Void = { _ in }
+    var onDrop: (Widget) -> Void = { _ in }
 
     private var isDragging: Bool {
         widget.offset != .zero
@@ -13,11 +15,9 @@ struct DraggableWidget: View {
             if isDragging {
                 Circle()
                     .stroke(widget.color.opacity(0.8), style: StrokeStyle(lineWidth: 2, dash: [6, 6]))
-                    .frame(width: 50, height: 50)
             }
 
             widget.color
-                .frame(width: 50, height: 50)
                 .clipShape(Capsule())
                 .appShadow(isDragging)
                 .offset(widget.offset)
@@ -31,21 +31,22 @@ struct DraggableWidget: View {
                         .onEnded { value in
                             widget.offset = .zero
                             widget.coordinate = value.location
-                            onDrag(widget)
+                            onDrop(widget)
                         }
                 )
         }
+        .frame(width: 50, height: 50)
+        .accessibilityIdentifier("palette.button.\(widget.id)")
     }
 }
-
 
 #Preview {
     @Previewable @State var widget = Widget(id: 0, color: .red, coordinate: .zero, offset: .zero)
 
-    Group {
-        DraggableWidget(widget: $widget, onDrag: { widget in
-            print("Point: \(widget.coordinate)")
-        })
-        .frame(width: 180, height: 180)
-    }
+    DraggableWidget(
+        widget: $widget,
+        onDrag: { print("dragging at \($0.coordinate)") },
+        onDrop: { print("dropped at \($0.coordinate)") }
+    )
+    .frame(width: 180, height: 180)
 }
