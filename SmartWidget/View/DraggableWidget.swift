@@ -22,7 +22,7 @@ struct DraggableWidget: View {
                 .appShadow(isDragging)
                 .offset(widget.offset)
                 .gesture(
-                    DragGesture()
+                    DragGesture(coordinateSpace: .global)
                         .onChanged { value in
                             widget.offset = value.translation
                             widget.coordinate = value.location
