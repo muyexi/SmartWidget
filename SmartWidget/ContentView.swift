@@ -10,18 +10,6 @@ struct ContentView: View {
     /// The drop currently being previewed, if any.
     @State private var pendingDrop: PendingDrop?
 
-    /// A drop in flight: the layout it would produce, and which widget in that
-    /// layout is the one under the finger.
-    private struct PendingDrop {
-        let layout: WidgetLayout
-        let widget: WidgetInstance
-    }
-
-    /// What to draw: the previewed layout while dragging, otherwise the real one.
-    private var visibleLayout: WidgetLayout {
-        pendingDrop?.layout ?? layout
-    }
-
     var body: some View {
         VStack {
             Spacer()
@@ -42,11 +30,10 @@ struct ContentView: View {
 
     private var dropArea: some View {
         GeometryReader { proxy in
-            let frame = proxy.frame(in: .global)
-
-            WidgetCanvasView(layout: visibleLayout)
-                .onAppear { canvasFrame = frame }
-                .onChange(of: frame) { _, newFrame in canvasFrame = newFrame }
+            WidgetCanvasView(layout: pendingDrop?.layout ?? layout)
+                .onAppear {
+                    canvasFrame = proxy.frame(in: .global)
+                }
         }
         .frame(maxWidth: .infinity)
         .aspectRatio(1.0, contentMode: .fit)
@@ -61,23 +48,23 @@ struct ContentView: View {
             return
         }
 
-        // Reuse the instance across the whole gesture so its tile keeps a stable
-        // identity and animates as the finger moves, instead of being rebuilt.
         let instance = pendingDrop?.widget ?? WidgetInstance(color: widget.color)
-        pendingDrop = PendingDrop(
-            layout: layout.inserting(instance, at: canvasPoint(for: widget), in: canvasFrame.size),
-            widget: instance
-        )
+        let layout = layout.inserting(instance, at: canvasPoint(for: widget), in: canvasFrame.size)
+
+        pendingDrop = PendingDrop(widget: instance, layout: layout)
     }
 
     /// Commits the drop, or discards it if the finger lifted off the canvas.
     private func commitDrop(_ widget: Widget) {
-        defer { pendingDrop = nil }
+        guard canvasFrame.contains(widget.coordinate) else {
+            pendingDrop = nil
+            return
+        }
 
-        guard canvasFrame.contains(widget.coordinate) else { return }
-
-        let instance = pendingDrop?.widget ?? WidgetInstance(color: widget.color)
+        guard let instance = pendingDrop?.widget else { return }
         layout = layout.inserting(instance, at: canvasPoint(for: widget), in: canvasFrame.size)
+
+        pendingDrop = nil
     }
 
     /// Converts a global drag location into the canvas' own coordinate space.
@@ -86,6 +73,12 @@ struct ContentView: View {
             x: widget.coordinate.x - canvasFrame.minX,
             y: widget.coordinate.y - canvasFrame.minY
         )
+    }
+
+    /// A drop in flight: the widget and the layout it would produce.
+    private struct PendingDrop {
+        let widget: WidgetInstance
+        let layout: WidgetLayout
     }
 }
 
