@@ -22,14 +22,14 @@ struct ContentView: View {
     }
 
     private var dropArea: some View {
-        GeometryReader { proxy in
-            WidgetCanvasView(layout: viewModel.visibleLayout)
-                .onAppear {
-                    viewModel.canvasFrame = proxy.frame(in: .global)
-                }
-        }
-        .frame(maxWidth: .infinity)
-        .aspectRatio(1.0, contentMode: .fit)
+        WidgetCanvasView(layout: viewModel.visibleLayout)
+            .frame(maxWidth: .infinity)
+            .aspectRatio(1.0, contentMode: .fit)
+            .onGeometryChange(for: CGRect.self) { proxy in
+                proxy.frame(in: .global)
+            } action: { canvasFrame in
+                viewModel.canvasFrame = canvasFrame
+            }
     }
 }
 
