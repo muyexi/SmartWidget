@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct WidgetCanvasView: View {
-    let layout: WidgetLayout
+    let layout: WidgetCanvasLayout
 
     private let spacing: CGFloat = 5
     private let cornerRadius: CGFloat = 36
@@ -33,7 +33,7 @@ struct WidgetCanvasView: View {
 }
 
 #Preview("Empty") {
-    WidgetCanvasView(layout: WidgetLayout())
+    WidgetCanvasView(layout: WidgetCanvasLayout())
         .frame(width: 320, height: 320)
         .padding()
 }
@@ -43,7 +43,7 @@ struct WidgetCanvasView: View {
     let b = WidgetInstance(color: .hotPink)
     let c = WidgetInstance(color: .limeGreen)
 
-    WidgetCanvasView(layout: WidgetLayout(rows: [[a, b], [c]]))
+    WidgetCanvasView(layout: WidgetCanvasLayout(rows: [[a, b], [c]]))
         .frame(width: 320, height: 320)
         .padding()
 }

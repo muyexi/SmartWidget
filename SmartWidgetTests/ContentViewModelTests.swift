@@ -34,7 +34,7 @@ struct ContentViewModelTests {
     func repeatedPreviewInSameArea() {
         let existing = WidgetInstance(color: .skyBlue)
         let viewModel = ContentViewModel(
-            layout: WidgetLayout(rows: [[existing]]),
+            layout: WidgetCanvasLayout(rows: [[existing]]),
             canvasFrame: canvasFrame
         )
 
@@ -50,7 +50,7 @@ struct ContentViewModelTests {
     func convertsToCanvasCoordinates() {
         let existing = WidgetInstance(color: .skyBlue)
         let viewModel = ContentViewModel(
-            layout: WidgetLayout(rows: [[existing]]),
+            layout: WidgetCanvasLayout(rows: [[existing]]),
             canvasFrame: canvasFrame
         )
 

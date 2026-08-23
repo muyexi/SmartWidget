@@ -3,12 +3,12 @@ import SwiftUI
 
 @Observable
 final class ContentViewModel {
-    private(set) var layout: WidgetLayout
+    private(set) var layout: WidgetCanvasLayout
     private var pendingDrop: PendingDrop?
 
     var canvasFrame: CGRect
 
-    var visibleLayout: WidgetLayout {
+    var visibleLayout: WidgetCanvasLayout {
         pendingDrop?.layout ?? layout
     }
 
@@ -16,7 +16,7 @@ final class ContentViewModel {
         pendingDrop != nil
     }
 
-    init(layout: WidgetLayout = WidgetLayout(), canvasFrame: CGRect = .zero) {
+    init(layout: WidgetCanvasLayout = WidgetCanvasLayout(), canvasFrame: CGRect = .zero) {
         self.layout = layout
         self.canvasFrame = canvasFrame
     }
@@ -65,6 +65,6 @@ final class ContentViewModel {
 
     private struct PendingDrop {
         let widget: WidgetInstance
-        let layout: WidgetLayout
+        let layout: WidgetCanvasLayout
     }
 }

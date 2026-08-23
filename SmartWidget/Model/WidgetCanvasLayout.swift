@@ -8,14 +8,14 @@ import Foundation
 /// row share that row's width equally, so this structure alone determines
 /// every frame — there is nothing else to keep in sync.
 ///
-///     WidgetLayout(rows: [[a, b], [c]])
+///     WidgetCanvasLayout(rows: [[a, b], [c]])
 ///
 ///     ┌─────────┬─────────┐
 ///     │    a    │    b    │   row 0
 ///     ├─────────┴─────────┤
 ///     │         c         │   row 1
 ///     └───────────────────┘
-struct WidgetLayout: Equatable {
+struct WidgetCanvasLayout: Equatable {
     private(set) var rows: [[WidgetInstance]]
 
     var isEmpty: Bool { rows.isEmpty }
@@ -104,9 +104,9 @@ struct WidgetLayout: Equatable {
     ///   - size: the size of the canvas the drop was made against.
     ///
     /// - Returns: a new layout containing `widget`.
-    func inserting(_ widget: WidgetInstance, at point: CGPoint, in size: CGSize) -> WidgetLayout {
+    func inserting(_ widget: WidgetInstance, at point: CGPoint, in size: CGSize) -> WidgetCanvasLayout {
         guard !rows.isEmpty, size.width > 0, size.height > 0 else {
-            return WidgetLayout(rows: [[widget]])
+            return WidgetCanvasLayout(rows: [[widget]])
         }
 
         let rowHeight = size.height / CGFloat(rows.count)
@@ -126,7 +126,7 @@ struct WidgetLayout: Equatable {
             updated[rowIndex].insert(widget, at: column)
         }
 
-        return WidgetLayout(rows: updated)
+        return WidgetCanvasLayout(rows: updated)
     }
 
     /// The slot in `row` that a drop at `x` belongs in: the number of widget
