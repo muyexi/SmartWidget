@@ -21,7 +21,7 @@ final class ContentViewModel {
         self.canvasFrame = canvasFrame
     }
 
-    func previewDrop(_ widget: Widget) {
+    func previewDrop(_ widget: DraggableWidget) {
         guard canvasFrame.contains(widget.coordinate) else {
             pendingDrop = nil
             return
@@ -37,7 +37,7 @@ final class ContentViewModel {
         pendingDrop = PendingDrop(widget: instance, layout: previewLayout)
     }
 
-    func commitDrop(_ widget: Widget) {
+    func commitDrop(_ widget: DraggableWidget) {
         guard canvasFrame.contains(widget.coordinate) else {
             pendingDrop = nil
             return
@@ -53,7 +53,7 @@ final class ContentViewModel {
         pendingDrop = nil
     }
 
-    private func canvasPoint(for widget: Widget) -> CGPoint {
+    private func canvasPoint(for widget: DraggableWidget) -> CGPoint {
         CGPoint(
             x: widget.coordinate.x - canvasFrame.minX,
             y: widget.coordinate.y - canvasFrame.minY

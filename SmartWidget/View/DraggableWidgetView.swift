@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct DraggableWidgetView: View {
-    @Binding var widget: Widget
+    @Binding var widget: DraggableWidget
     let isPreviewing: Bool
 
-    var onDrag: (Widget) -> Void = { _ in }
-    var onDrop: (Widget) -> Void = { _ in }
+    var onDrag: (DraggableWidget) -> Void = { _ in }
+    var onDrop: (DraggableWidget) -> Void = { _ in }
 
     private var isDragging: Bool {
         widget.offset != .zero
@@ -43,7 +43,7 @@ struct DraggableWidgetView: View {
 }
 
 #Preview {
-    @Previewable @State var widget = Widget(id: 0, color: .red, coordinate: .zero, offset: .zero)
+    @Previewable @State var widget = DraggableWidget(id: 0, color: .red, coordinate: .zero, offset: .zero)
 
     DraggableWidgetView(
         widget: $widget,

@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct WidgetToolbar: View {
-    @State private var widgets: [Widget] = Widget.toolbarItems
+    @State private var widgets: [DraggableWidget] = DraggableWidget.toolbarItems
     var isPreviewing: Bool = false
-    var onDrag: (Widget) -> Void = { _ in }
-    var onDrop: (Widget) -> Void = { _ in }
+    var onDrag: (DraggableWidget) -> Void = { _ in }
+    var onDrop: (DraggableWidget) -> Void = { _ in }
 
     var body: some View {
         HStack {

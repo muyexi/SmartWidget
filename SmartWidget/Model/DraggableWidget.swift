@@ -1,14 +1,14 @@
 import SwiftUI
 
-struct Widget: Identifiable {
+struct DraggableWidget: Identifiable {
     let id: Int
     let color: Color
     var coordinate: CGPoint
     var offset: CGSize
 }
 
-extension Widget {
-    static let toolbarItems: [Widget] =
+extension DraggableWidget {
+    static let toolbarItems: [DraggableWidget] =
     [
         .skyBlue,
         .hotPink,
@@ -16,6 +16,6 @@ extension Widget {
         .limeGreen,
         .vibrantOrange
     ].enumerated().map { index, color in
-        Widget(id: index, color: color, coordinate: .zero, offset: .zero)
+        DraggableWidget(id: index, color: color, coordinate: .zero, offset: .zero)
     }
 }

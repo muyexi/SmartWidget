@@ -58,7 +58,7 @@ struct ContentViewModelTests {
         #expect(viewModel.layout.widgets.first?.id == previewID)
     }
 
-    private func widget(at coordinate: CGPoint) -> SmartWidget.Widget {
-        SmartWidget.Widget(id: 0, color: .hotPink, coordinate: coordinate, offset: .zero)
+    private func widget(at coordinate: CGPoint) -> SmartWidget.DraggableWidget {
+        SmartWidget.DraggableWidget(id: 0, color: .hotPink, coordinate: coordinate, offset: .zero)
     }
 }
