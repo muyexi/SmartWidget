@@ -30,6 +30,22 @@ struct ContentViewModelTests {
         #expect(viewModel.visibleLayout.isEmpty)
     }
 
+    @Test("Dragging within the same insertion area keeps the preview unchanged")
+    func repeatedPreviewInSameArea() {
+        let existing = WidgetInstance(color: .skyBlue)
+        let viewModel = ContentViewModel(
+            layout: WidgetLayout(rows: [[existing]]),
+            canvasFrame: canvasFrame
+        )
+
+        viewModel.previewDrop(widget(at: CGPoint(x: 250, y: 300)))
+        let previewLayout = viewModel.visibleLayout
+
+        viewModel.previewDrop(widget(at: CGPoint(x: 260, y: 300)))
+
+        #expect(viewModel.visibleLayout == previewLayout)
+    }
+
     @Test("Global drag coordinates are converted before resolving insertion")
     func convertsToCanvasCoordinates() {
         let existing = WidgetInstance(color: .skyBlue)

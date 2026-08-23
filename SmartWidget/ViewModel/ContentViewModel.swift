@@ -23,7 +23,9 @@ final class ContentViewModel {
 
     func previewDrop(_ widget: DraggableWidget) {
         guard canvasFrame.contains(widget.coordinate) else {
-            pendingDrop = nil
+            if pendingDrop != nil {
+                pendingDrop = nil
+            }
             return
         }
 
@@ -34,6 +36,7 @@ final class ContentViewModel {
             in: canvasFrame.size
         )
 
+        guard pendingDrop?.layout != previewLayout else { return }
         pendingDrop = PendingDrop(widget: instance, layout: previewLayout)
     }
 
