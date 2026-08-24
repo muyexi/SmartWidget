@@ -3,10 +3,14 @@ import SwiftUI
 
 @Observable
 final class ContentViewModel {
-    private(set) var canvas: WidgetCanvas
+    private var history: CanvasHistory
     private var pendingDrop: PendingDrop?
 
     var canvasFrame: CGRect
+
+    var canvas: WidgetCanvas {
+        history.current
+    }
 
     var visibleCanvas: WidgetCanvas {
         pendingDrop?.canvas ?? canvas
@@ -16,8 +20,20 @@ final class ContentViewModel {
         pendingDrop != nil
     }
 
+    var canUndo: Bool {
+        history.canUndo
+    }
+
+    var canRedo: Bool {
+        history.canRedo
+    }
+
+    var canClear: Bool {
+        history.canClear
+    }
+
     init(canvas: WidgetCanvas = WidgetCanvas(), canvasFrame: CGRect = .zero) {
-        self.canvas = canvas
+        history = CanvasHistory(current: canvas)
         self.canvasFrame = canvasFrame
     }
 
@@ -47,13 +63,36 @@ final class ContentViewModel {
         }
 
         guard let instance = pendingDrop?.widget else { return }
-        canvas = canvas.inserting(
-            instance,
-            at: canvasPoint(for: widget),
-            in: canvasFrame.size
+        history.commit(
+            canvas.inserting(
+                instance,
+                at: canvasPoint(for: widget),
+                in: canvasFrame.size
+            )
         )
 
         pendingDrop = nil
+    }
+
+    func undo() {
+        cancelPendingDrop()
+        history.undo()
+    }
+
+    func redo() {
+        cancelPendingDrop()
+        history.redo()
+    }
+
+    func clear() {
+        cancelPendingDrop()
+        history.clear()
+    }
+
+    private func cancelPendingDrop() {
+        if pendingDrop != nil {
+            pendingDrop = nil
+        }
     }
 
     private func canvasPoint(for widget: DraggableWidget) -> CGPoint {

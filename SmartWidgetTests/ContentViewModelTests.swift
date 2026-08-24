@@ -80,6 +80,58 @@ struct ContentViewModelTests {
         #expect(viewModel.canvas.widgets.first?.id == previewID)
     }
 
+    @Test("Undo restores the previous committed canvas")
+    func undo() {
+        let viewModel = ContentViewModel(canvasFrame: canvasFrame)
+        let firstDrop = widget(at: CGPoint(x: 200, y: 300))
+        viewModel.previewDrop(firstDrop)
+        viewModel.commitDrop(firstDrop)
+        let firstCanvas = viewModel.canvas
+
+        let secondDrop = widget(at: CGPoint(x: 250, y: 300))
+        viewModel.previewDrop(secondDrop)
+        viewModel.commitDrop(secondDrop)
+        #expect(viewModel.canvas != firstCanvas)
+
+        viewModel.undo()
+
+        #expect(viewModel.canvas == firstCanvas)
+        #expect(viewModel.canRedo)
+    }
+
+    @Test("Clear empties the canvas and disables undo")
+    func clear() {
+        let viewModel = ContentViewModel(canvasFrame: canvasFrame)
+        let drop = widget(at: CGPoint(x: 200, y: 300))
+        viewModel.previewDrop(drop)
+        viewModel.commitDrop(drop)
+        #expect(viewModel.canClear)
+
+        viewModel.clear()
+
+        #expect(viewModel.canvas.isEmpty)
+        #expect(!viewModel.canUndo)
+        #expect(!viewModel.canRedo)
+        #expect(!viewModel.canClear)
+    }
+
+    @Test("Undo during a preview cancels the preview")
+    func undoDuringPreview() {
+        let viewModel = ContentViewModel(canvasFrame: canvasFrame)
+        let committedDrop = widget(at: CGPoint(x: 200, y: 300))
+        viewModel.previewDrop(committedDrop)
+        viewModel.commitDrop(committedDrop)
+
+        viewModel.previewDrop(widget(at: CGPoint(x: 250, y: 300)))
+        #expect(viewModel.isPreviewing)
+
+        viewModel.undo()
+
+        #expect(!viewModel.isPreviewing)
+        #expect(viewModel.canvas.isEmpty)
+        #expect(viewModel.visibleCanvas == viewModel.canvas)
+    }
+
     private func widget(at coordinate: CGPoint) -> SmartWidget.DraggableWidget {
         SmartWidget.DraggableWidget(id: 0, color: .hotPink, coordinate: coordinate, offset: .zero)
     }

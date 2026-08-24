@@ -5,6 +5,15 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
+            HeaderBar(
+                canUndo: viewModel.canUndo,
+                canRedo: viewModel.canRedo,
+                canClear: viewModel.canClear,
+                onUndo: viewModel.undo,
+                onRedo: viewModel.redo,
+                onClear: viewModel.clear
+            )
+
             Spacer()
 
             dropArea
