@@ -15,8 +15,8 @@ struct ContentViewModelTests {
         viewModel.previewDrop(widget(at: CGPoint(x: 200, y: 300)))
 
         #expect(viewModel.isPreviewing)
-        #expect(viewModel.layout.isEmpty)
-        #expect(viewModel.visibleLayout.widgets.count == 1)
+        #expect(viewModel.canvas.isEmpty)
+        #expect(viewModel.visibleCanvas.widgets.count == 1)
     }
 
     @Test("Dragging outside the canvas clears the preview")
@@ -27,30 +27,30 @@ struct ContentViewModelTests {
         viewModel.previewDrop(widget(at: CGPoint(x: 50, y: 300)))
 
         #expect(!viewModel.isPreviewing)
-        #expect(viewModel.visibleLayout.isEmpty)
+        #expect(viewModel.visibleCanvas.isEmpty)
     }
 
     @Test("Dragging within the same insertion area keeps the preview unchanged")
     func repeatedPreviewInSameArea() {
         let existing = WidgetInstance(color: .skyBlue)
         let viewModel = ContentViewModel(
-            layout: WidgetCanvasLayout(.widget(existing)),
+            canvas: WidgetCanvas(.widget(existing)),
             canvasFrame: canvasFrame
         )
 
         viewModel.previewDrop(widget(at: CGPoint(x: 250, y: 300)))
-        let previewLayout = viewModel.visibleLayout
+        let previewCanvas = viewModel.visibleCanvas
 
         viewModel.previewDrop(widget(at: CGPoint(x: 260, y: 300)))
 
-        #expect(viewModel.visibleLayout == previewLayout)
+        #expect(viewModel.visibleCanvas == previewCanvas)
     }
 
     @Test("Global drag coordinates are converted before resolving insertion")
     func convertsToCanvasCoordinates() {
         let existing = WidgetInstance(color: .skyBlue)
         let viewModel = ContentViewModel(
-            layout: WidgetCanvasLayout(.widget(existing)),
+            canvas: WidgetCanvas(.widget(existing)),
             canvasFrame: canvasFrame
         )
 
@@ -59,9 +59,9 @@ struct ContentViewModelTests {
         // canvas, and land underneath instead.
         viewModel.previewDrop(widget(at: CGPoint(x: 150, y: 300)))
 
-        #expect(viewModel.visibleLayout.widgets.count == 2)
-        #expect(viewModel.visibleLayout.widgets.last?.id == existing.id)
-        #expect(viewModel.visibleLayout.placements(in: canvasFrame.size).map(\.frame) == [
+        #expect(viewModel.visibleCanvas.widgets.count == 2)
+        #expect(viewModel.visibleCanvas.widgets.last?.id == existing.id)
+        #expect(viewModel.visibleCanvas.placements(in: canvasFrame.size).map(\.frame) == [
             CGRect(x: 0, y: 0, width: 100, height: 200),
             CGRect(x: 100, y: 0, width: 100, height: 200),
         ])
@@ -72,12 +72,12 @@ struct ContentViewModelTests {
         let viewModel = ContentViewModel(canvasFrame: canvasFrame)
         let draggedWidget = widget(at: CGPoint(x: 200, y: 300))
         viewModel.previewDrop(draggedWidget)
-        let previewID = viewModel.visibleLayout.widgets.first?.id
+        let previewID = viewModel.visibleCanvas.widgets.first?.id
 
         viewModel.commitDrop(draggedWidget)
 
         #expect(!viewModel.isPreviewing)
-        #expect(viewModel.layout.widgets.first?.id == previewID)
+        #expect(viewModel.canvas.widgets.first?.id == previewID)
     }
 
     private func widget(at coordinate: CGPoint) -> SmartWidget.DraggableWidget {

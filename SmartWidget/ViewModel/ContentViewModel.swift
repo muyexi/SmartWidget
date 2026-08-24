@@ -3,21 +3,21 @@ import SwiftUI
 
 @Observable
 final class ContentViewModel {
-    private(set) var layout: WidgetCanvasLayout
+    private(set) var canvas: WidgetCanvas
     private var pendingDrop: PendingDrop?
 
     var canvasFrame: CGRect
 
-    var visibleLayout: WidgetCanvasLayout {
-        pendingDrop?.layout ?? layout
+    var visibleCanvas: WidgetCanvas {
+        pendingDrop?.canvas ?? canvas
     }
 
     var isPreviewing: Bool {
         pendingDrop != nil
     }
 
-    init(layout: WidgetCanvasLayout = WidgetCanvasLayout(), canvasFrame: CGRect = .zero) {
-        self.layout = layout
+    init(canvas: WidgetCanvas = WidgetCanvas(), canvasFrame: CGRect = .zero) {
+        self.canvas = canvas
         self.canvasFrame = canvasFrame
     }
 
@@ -30,14 +30,14 @@ final class ContentViewModel {
         }
 
         let instance = pendingDrop?.widget ?? WidgetInstance(color: widget.color)
-        let previewLayout = layout.inserting(
+        let previewCanvas = canvas.inserting(
             instance,
             at: canvasPoint(for: widget),
             in: canvasFrame.size
         )
 
-        guard pendingDrop?.layout != previewLayout else { return }
-        pendingDrop = PendingDrop(widget: instance, layout: previewLayout)
+        guard pendingDrop?.canvas != previewCanvas else { return }
+        pendingDrop = PendingDrop(widget: instance, canvas: previewCanvas)
     }
 
     func commitDrop(_ widget: DraggableWidget) {
@@ -47,7 +47,7 @@ final class ContentViewModel {
         }
 
         guard let instance = pendingDrop?.widget else { return }
-        layout = layout.inserting(
+        canvas = canvas.inserting(
             instance,
             at: canvasPoint(for: widget),
             in: canvasFrame.size
@@ -65,6 +65,6 @@ final class ContentViewModel {
 
     private struct PendingDrop {
         let widget: WidgetInstance
-        let layout: WidgetCanvasLayout
+        let canvas: WidgetCanvas
     }
 }

@@ -6,8 +6,8 @@ import Testing
 ///
 /// A 200×200 canvas keeps the expected values whole wherever the container is even,
 /// so the assertions read as geometry rather than as floating-point arithmetic.
-@Suite("WidgetCanvasLayout frames")
-struct CanvasLayoutFrameTests {
+@Suite("WidgetCanvas frames")
+struct WidgetCanvasFrameTests {
     private let canvas = CGSize(width: 200, height: 200)
 
     private let a = WidgetInstance(color: .skyBlue)
@@ -17,19 +17,19 @@ struct CanvasLayoutFrameTests {
 
     @Test("An empty layout produces no placements")
     func emptyLayout() {
-        #expect(WidgetCanvasLayout().placements(in: canvas).isEmpty)
+        #expect(WidgetCanvas().placements(in: canvas).isEmpty)
     }
 
     @Test("A lone widget fills the canvas")
     func singleWidgetFillsCanvas() {
-        let placements = WidgetCanvasLayout(.widget(a)).placements(in: canvas)
+        let placements = WidgetCanvas(.widget(a)).placements(in: canvas)
 
         #expect(placements.map(\.frame) == [CGRect(x: 0, y: 0, width: 200, height: 200)])
     }
 
     @Test("A row splits the width")
     func rowSplitsWidth() {
-        let placements = WidgetCanvasLayout(.row(.widget(a), .widget(b))).placements(in: canvas)
+        let placements = WidgetCanvas(.row(.widget(a), .widget(b))).placements(in: canvas)
 
         #expect(placements.map(\.frame) == [
             CGRect(x: 0, y: 0, width: 100, height: 200),
@@ -39,7 +39,7 @@ struct CanvasLayoutFrameTests {
 
     @Test("A column splits the height")
     func columnSplitsHeight() {
-        let placements = WidgetCanvasLayout(.column(.widget(a), .widget(b))).placements(in: canvas)
+        let placements = WidgetCanvas(.column(.widget(a), .widget(b))).placements(in: canvas)
 
         #expect(placements.map(\.frame) == [
             CGRect(x: 0, y: 0, width: 200, height: 100),
@@ -49,7 +49,7 @@ struct CanvasLayoutFrameTests {
 
     @Test("Every child of a container gets an equal share, however many there are")
     func splitDividesEvenly() {
-        let layout = WidgetCanvasLayout(.column(.widget(a), .widget(b), .widget(c), .widget(d)))
+        let layout = WidgetCanvas(.column(.widget(a), .widget(b), .widget(c), .widget(d)))
 
         #expect(layout.placements(in: canvas).map(\.frame) == [
             CGRect(x: 0, y: 0, width: 200, height: 50),
@@ -63,7 +63,7 @@ struct CanvasLayoutFrameTests {
 
     @Test("A branch subdivides its own area, leaving its siblings alone")
     func nestedSplitStaysWithinItsBranch() {
-        let layout = WidgetCanvasLayout(
+        let layout = WidgetCanvas(
             .row(.widget(a), .column(.widget(b), .widget(c)))
         )
 
@@ -76,8 +76,8 @@ struct CanvasLayoutFrameTests {
 
     @Test("A container nested in one that divides the same way is absorbed into it")
     func sameAxisSplitsFlatten() {
-        let nested = WidgetCanvasLayout(.row(.widget(a), .row(.widget(b), .widget(c))))
-        let flat = WidgetCanvasLayout(.row(.widget(a), .widget(b), .widget(c)))
+        let nested = WidgetCanvas(.row(.widget(a), .row(.widget(b), .widget(c))))
+        let flat = WidgetCanvas(.row(.widget(a), .widget(b), .widget(c)))
 
         #expect(nested == flat)
         #expect(nested.placements(in: canvas).map(\.frame).first?.width == canvas.width / 3)

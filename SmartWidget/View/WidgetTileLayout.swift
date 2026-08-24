@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct WidgetTileLayout: Layout {
-    let layout: WidgetCanvasLayout
+    let canvas: WidgetCanvas
     var spacing: CGFloat = 0
 
     func sizeThatFits(
@@ -18,7 +18,7 @@ struct WidgetTileLayout: Layout {
         subviews: Subviews,
         cache: inout ()
     ) {
-        let placements = layout.placements(in: bounds.size, spacing: spacing)
+        let placements = canvas.placements(in: bounds.size, spacing: spacing)
 
         for (subview, placement) in zip(subviews, placements) {
             let frame = placement.frame.offsetBy(dx: bounds.minX, dy: bounds.minY)

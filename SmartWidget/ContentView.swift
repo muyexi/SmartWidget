@@ -22,7 +22,7 @@ struct ContentView: View {
     }
 
     private var dropArea: some View {
-        WidgetCanvasView(layout: viewModel.visibleLayout)
+        WidgetCanvasView(canvas: viewModel.visibleCanvas)
             .frame(maxWidth: .infinity)
             .aspectRatio(1.0, contentMode: .fit)
             .onGeometryChange(for: CGRect.self) { proxy in

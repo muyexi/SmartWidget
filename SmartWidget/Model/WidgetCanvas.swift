@@ -9,7 +9,7 @@ import Foundation
 ///
 /// For example:
 ///
-///     WidgetCanvasLayout(.row(.widget(a), .column(.widget(b), .widget(c))))
+///     WidgetCanvas(.row(.widget(a), .column(.widget(b), .widget(c))))
 ///
 ///     ┌─────────┬─────────┐
 ///     │         │    b    │
@@ -19,7 +19,7 @@ import Foundation
 ///
 /// The tree alone determines every frame — there is nothing else to keep in
 /// sync, so two layouts that draw the same canvas are `==`.
-struct WidgetCanvasLayout: Equatable {
+struct WidgetCanvas: Equatable {
     /// The whole canvas, or `nil` while nothing has been dropped on it yet.
     private(set) var root: Node?
 
@@ -48,8 +48,8 @@ struct WidgetCanvasLayout: Equatable {
     }
 }
 
-extension WidgetCanvasLayout.Node {
-    typealias Axis = WidgetCanvasLayout.Axis
+extension WidgetCanvas.Node {
+    typealias Axis = WidgetCanvas.Axis
 
     /// Children side by side, sharing the width.
     static func row(_ children: Self...) -> Self {
@@ -88,7 +88,7 @@ extension WidgetCanvasLayout.Node {
 
 // MARK: - Question 2: computing each widget's frame
 
-extension WidgetCanvasLayout {
+extension WidgetCanvas {
     /// A widget and the rectangle it occupies, in canvas coordinates.
     ///
     /// A placement is derived, never stored: it is rebuilt on every layout pass
@@ -140,7 +140,7 @@ extension WidgetCanvasLayout {
 
 // MARK: - Question 3: resolving a drop
 
-extension WidgetCanvasLayout {
+extension WidgetCanvas {
     /// The side of a widget that a drop landed nearest to.
     enum Edge: Equatable {
         case leading, trailing, top, bottom
@@ -199,9 +199,9 @@ extension WidgetCanvasLayout {
     ///   - size: the size of the canvas the drop was made against.
     ///
     /// - Returns: a new layout containing `widget`.
-    func inserting(_ widget: WidgetInstance, at point: CGPoint, in size: CGSize) -> WidgetCanvasLayout {
+    func inserting(_ widget: WidgetInstance, at point: CGPoint, in size: CGSize) -> WidgetCanvas {
         guard let root, size.width > 0, size.height > 0 else {
-            return WidgetCanvasLayout(.widget(widget))
+            return WidgetCanvas(.widget(widget))
         }
 
         let inserted = Self.inserting(
@@ -211,7 +211,7 @@ extension WidgetCanvasLayout {
             in: CGRect(origin: .zero, size: size)
         )
 
-        return WidgetCanvasLayout(inserted)
+        return WidgetCanvas(inserted)
     }
 
     /// Returns `node`, occupying `rect`, with `widget` inserted at `point`.
@@ -261,7 +261,7 @@ private extension CGRect {
     /// `spacing` gutter between neighbours and none at the ends.
     ///
     /// - Returns: the slices in order, or `nil` if the gutters leave them no room.
-    func slices(along axis: WidgetCanvasLayout.Axis, count: Int, spacing: CGFloat) -> [CGRect]? {
+    func slices(along axis: WidgetCanvas.Axis, count: Int, spacing: CGFloat) -> [CGRect]? {
         let total = axis == .horizontal ? width : height
         let extent = (total - spacing * CGFloat(count - 1)) / CGFloat(count)
         guard extent > 0 else { return nil }

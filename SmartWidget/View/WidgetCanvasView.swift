@@ -1,25 +1,25 @@
 import SwiftUI
 
 struct WidgetCanvasView: View {
-    let layout: WidgetCanvasLayout
+    let canvas: WidgetCanvas
 
     private let spacing: CGFloat = 0
     private let cornerRadius: CGFloat = 36
 
     var body: some View {
         ZStack {
-            if layout.isEmpty {
+            if canvas.isEmpty {
                 WidgetWelcomeView()
                     .transition(.opacity.combined(with: .scale(scale: 0.97)))
             }
 
-            WidgetTileLayout(layout: layout, spacing: spacing) {
-                ForEach(layout.widgets) { widget in
+            WidgetTileLayout(canvas: canvas, spacing: spacing) {
+                ForEach(canvas.widgets) { widget in
                     widgetTileView(widget)
                 }
             }
         }
-        .animation(.spring(response: 0.45, dampingFraction: 0.82), value: layout)
+        .animation(.spring(response: 0.45, dampingFraction: 0.82), value: canvas)
     }
 
     private func widgetTileView(_ widget: WidgetInstance) -> some View {
@@ -32,7 +32,7 @@ struct WidgetCanvasView: View {
 }
 
 #Preview("Empty") {
-    WidgetCanvasView(layout: WidgetCanvasLayout())
+    WidgetCanvasView(canvas: WidgetCanvas())
         .frame(width: 320, height: 320)
         .padding()
 }
@@ -45,7 +45,7 @@ struct WidgetCanvasView: View {
     let e = WidgetInstance(color: .limeGreen)
     let h = WidgetInstance(color: .brightYellow)
 
-    WidgetCanvasView(layout: WidgetCanvasLayout(
+    WidgetCanvasView(canvas: WidgetCanvas(
         .row(
             .widget(a),
             .column(
