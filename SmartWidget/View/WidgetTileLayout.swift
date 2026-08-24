@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct WidgetGridLayout: Layout {
+struct WidgetTileLayout: Layout {
     let layout: WidgetCanvasLayout
     var spacing: CGFloat = 0
 

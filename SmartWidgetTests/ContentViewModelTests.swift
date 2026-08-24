@@ -34,7 +34,7 @@ struct ContentViewModelTests {
     func repeatedPreviewInSameArea() {
         let existing = WidgetInstance(color: .skyBlue)
         let viewModel = ContentViewModel(
-            layout: WidgetCanvasLayout(rows: [[existing]]),
+            layout: WidgetCanvasLayout(.widget(existing)),
             canvasFrame: canvasFrame
         )
 
@@ -50,15 +50,21 @@ struct ContentViewModelTests {
     func convertsToCanvasCoordinates() {
         let existing = WidgetInstance(color: .skyBlue)
         let viewModel = ContentViewModel(
-            layout: WidgetCanvasLayout(rows: [[existing]]),
+            layout: WidgetCanvasLayout(.widget(existing)),
             canvasFrame: canvasFrame
         )
 
-        viewModel.previewDrop(widget(at: CGPoint(x: 260, y: 300)))
+        // Global (150, 300) is canvas (50, 100): the leading side of the widget
+        // already there. Left unconverted it would read as a drop below the
+        // canvas, and land underneath instead.
+        viewModel.previewDrop(widget(at: CGPoint(x: 150, y: 300)))
 
-        #expect(viewModel.visibleLayout.rows.count == 1)
-        #expect(viewModel.visibleLayout.rows[0].first?.id == existing.id)
-        #expect(viewModel.visibleLayout.rows[0].count == 2)
+        #expect(viewModel.visibleLayout.widgets.count == 2)
+        #expect(viewModel.visibleLayout.widgets.last?.id == existing.id)
+        #expect(viewModel.visibleLayout.placements(in: canvasFrame.size).map(\.frame) == [
+            CGRect(x: 0, y: 0, width: 100, height: 200),
+            CGRect(x: 100, y: 0, width: 100, height: 200),
+        ])
     }
 
     @Test("Committing preserves the previewed widget identity")

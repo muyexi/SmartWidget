@@ -2,13 +2,18 @@ import CoreGraphics
 import Testing
 @testable import SmartWidget
 
-/// Question 2 — the layout structure produces the frames we expect.
+/// Question 2 — the layout tree produces the frames we expect.
 ///
-/// A 200×200 canvas keeps every expected value a whole number, so the
-/// assertions read as geometry rather than as floating-point arithmetic.
+/// A 200×200 canvas keeps the expected values whole wherever the container is even,
+/// so the assertions read as geometry rather than as floating-point arithmetic.
 @Suite("WidgetCanvasLayout frames")
 struct CanvasLayoutFrameTests {
     private let canvas = CGSize(width: 200, height: 200)
+
+    private let a = WidgetInstance(color: .skyBlue)
+    private let b = WidgetInstance(color: .hotPink)
+    private let c = WidgetInstance(color: .limeGreen)
+    private let d = WidgetInstance(color: .brightYellow)
 
     @Test("An empty layout produces no placements")
     func emptyLayout() {
@@ -17,17 +22,14 @@ struct CanvasLayoutFrameTests {
 
     @Test("A lone widget fills the canvas")
     func singleWidgetFillsCanvas() {
-        let a = WidgetInstance(color: .skyBlue)
-        let placements = WidgetCanvasLayout(rows: [[a]]).placements(in: canvas)
+        let placements = WidgetCanvasLayout(.widget(a)).placements(in: canvas)
 
         #expect(placements.map(\.frame) == [CGRect(x: 0, y: 0, width: 200, height: 200)])
     }
 
-    @Test("Widgets in one row split its width")
+    @Test("A row splits the width")
     func rowSplitsWidth() {
-        let a = WidgetInstance(color: .skyBlue)
-        let b = WidgetInstance(color: .hotPink)
-        let placements = WidgetCanvasLayout(rows: [[a, b]]).placements(in: canvas)
+        let placements = WidgetCanvasLayout(.row(.widget(a), .widget(b))).placements(in: canvas)
 
         #expect(placements.map(\.frame) == [
             CGRect(x: 0, y: 0, width: 100, height: 200),
@@ -35,11 +37,9 @@ struct CanvasLayoutFrameTests {
         ])
     }
 
-    @Test("Rows split the canvas height")
-    func rowsSplitHeight() {
-        let a = WidgetInstance(color: .skyBlue)
-        let b = WidgetInstance(color: .hotPink)
-        let placements = WidgetCanvasLayout(rows: [[a], [b]]).placements(in: canvas)
+    @Test("A column splits the height")
+    func columnSplitsHeight() {
+        let placements = WidgetCanvasLayout(.column(.widget(a), .widget(b))).placements(in: canvas)
 
         #expect(placements.map(\.frame) == [
             CGRect(x: 0, y: 0, width: 200, height: 100),
@@ -47,48 +47,39 @@ struct CanvasLayoutFrameTests {
         ])
     }
 
-    @Test("Rows of differing widget counts are laid out independently")
-    func mixedRows() {
-        let a = WidgetInstance(color: .skyBlue)
-        let b = WidgetInstance(color: .hotPink)
-        let c = WidgetInstance(color: .limeGreen)
-        let layout = WidgetCanvasLayout(rows: [[a, b], [c]])
+    @Test("Every child of a container gets an equal share, however many there are")
+    func splitDividesEvenly() {
+        let layout = WidgetCanvasLayout(.column(.widget(a), .widget(b), .widget(c), .widget(d)))
 
         #expect(layout.placements(in: canvas).map(\.frame) == [
-            CGRect(x: 0, y: 0, width: 100, height: 100),
+            CGRect(x: 0, y: 0, width: 200, height: 50),
+            CGRect(x: 0, y: 50, width: 200, height: 50),
+            CGRect(x: 0, y: 100, width: 200, height: 50),
+            CGRect(x: 0, y: 150, width: 200, height: 50),
+        ])
+    }
+
+    // MARK: Nesting — the shape a flat list of rows could not express
+
+    @Test("A branch subdivides its own area, leaving its siblings alone")
+    func nestedSplitStaysWithinItsBranch() {
+        let layout = WidgetCanvasLayout(
+            .row(.widget(a), .column(.widget(b), .widget(c)))
+        )
+
+        #expect(layout.placements(in: canvas).map(\.frame) == [
+            CGRect(x: 0, y: 0, width: 100, height: 200),
             CGRect(x: 100, y: 0, width: 100, height: 100),
-            CGRect(x: 0, y: 100, width: 200, height: 100),
+            CGRect(x: 100, y: 100, width: 100, height: 100),
         ])
     }
 
-    @Test("Spacing goes between neighbours, never against the canvas edges")
-    func spacingSitsBetweenNeighbours() {
-        let a = WidgetInstance(color: .skyBlue)
-        let b = WidgetInstance(color: .hotPink)
-        let layout = WidgetCanvasLayout(rows: [[a, b], [WidgetInstance(color: .limeGreen)]])
-        let placements = layout.placements(in: canvas, spacing: 20)
+    @Test("A container nested in one that divides the same way is absorbed into it")
+    func sameAxisSplitsFlatten() {
+        let nested = WidgetCanvasLayout(.row(.widget(a), .row(.widget(b), .widget(c))))
+        let flat = WidgetCanvasLayout(.row(.widget(a), .widget(b), .widget(c)))
 
-        #expect(placements.map(\.frame) == [
-            CGRect(x: 0, y: 0, width: 90, height: 90),
-            CGRect(x: 110, y: 0, width: 90, height: 90),
-            CGRect(x: 0, y: 110, width: 200, height: 90),
-        ])
-    }
-
-    @Test("Placements come back in reading order")
-    func placementsFollowReadingOrder() {
-        let a = WidgetInstance(color: .skyBlue)
-        let b = WidgetInstance(color: .hotPink)
-        let c = WidgetInstance(color: .limeGreen)
-        let layout = WidgetCanvasLayout(rows: [[a, b], [c]])
-
-        #expect(layout.placements(in: canvas).map(\.id) == [a.id, b.id, c.id])
-    }
-
-    @Test("Spacing that leaves no room produces nothing rather than negative frames")
-    func spacingLargerThanCanvas() {
-        let layout = WidgetCanvasLayout(rows: [[WidgetInstance(color: .skyBlue)], [WidgetInstance(color: .hotPink)]])
-
-        #expect(layout.placements(in: canvas, spacing: 400).isEmpty)
+        #expect(nested == flat)
+        #expect(nested.placements(in: canvas).map(\.frame).first?.width == canvas.width / 3)
     }
 }

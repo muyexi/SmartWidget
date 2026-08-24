@@ -92,36 +92,20 @@ final class WidgetDragAndDropUITests: XCTestCase {
         let frames = (0..<2).map { tiles.element(boundBy: $0).frame }.sorted { $0.minX < $1.minX }
         XCTAssertEqual(frames[0].height, canvas.height, accuracy: 2, "Both stay in one row")
         XCTAssertEqual(frames[1].height, canvas.height, accuracy: 2)
-        XCTAssertLessThan(frames[0].maxX, frames[1].minX, "They sit side by side, not overlapping")
+        XCTAssertLessThanOrEqual(frames[0].maxX, frames[1].minX, "They sit side by side, not overlapping")
         XCTAssertEqual(frames[0].width, frames[1].width, accuracy: 2, "A row splits its width evenly")
     }
 
-    func testDroppingNearTheBottomEdgeStartsANewRow() {
+    func testDroppingNearTheBottomEdgeStacksTheWidgetBelow() {
         drag(0, toRelative: CGPoint(x: 0.5, y: 0.5))
         drag(1, toRelative: CGPoint(x: 0.5, y: 0.95))
 
         XCTAssertEqual(tiles.count, 2)
 
         let frames = (0..<2).map { tiles.element(boundBy: $0).frame }.sorted { $0.minY < $1.minY }
-        XCTAssertLessThan(frames[0].maxY, frames[1].minY, "The second widget sits below the first")
-        XCTAssertEqual(frames[0].width, canvas.width, accuracy: 2, "Each row still spans the full width")
+        XCTAssertLessThanOrEqual(frames[0].maxY, frames[1].minY, "The second widget sits below the first")
+        XCTAssertEqual(frames[0].width, canvas.width, accuracy: 2, "Each still spans the full width")
         XCTAssertEqual(frames[1].width, canvas.width, accuracy: 2)
-    }
-
-    func testRowsAndColumnsCombine() {
-        drag(0, toRelative: CGPoint(x: 0.5, y: 0.5))   // one row: [A]
-        drag(1, toRelative: CGPoint(x: 0.8, y: 0.5))   // one row: [A, B]
-        drag(2, toRelative: CGPoint(x: 0.5, y: 0.95))  // two rows: [A, B], [C]
-
-        XCTAssertEqual(tiles.count, 3)
-
-        let frames = (0..<3).map { tiles.element(boundBy: $0).frame }
-        let topRow = frames.filter { $0.minY < frames.map(\.minY).max()! }
-        let bottomRow = frames.filter { $0.minY == frames.map(\.minY).max()! }
-
-        XCTAssertEqual(topRow.count, 2, "Two widgets share the top row")
-        XCTAssertEqual(bottomRow.count, 1, "The third has a row to itself")
-        XCTAssertGreaterThan(bottomRow[0].width, topRow[0].width, "A lone widget in a row is wider")
     }
 
     func testDroppingOutsideTheCanvasPlacesNothing() {

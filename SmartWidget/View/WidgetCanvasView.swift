@@ -3,7 +3,7 @@ import SwiftUI
 struct WidgetCanvasView: View {
     let layout: WidgetCanvasLayout
 
-    private let spacing: CGFloat = 5
+    private let spacing: CGFloat = 0
     private let cornerRadius: CGFloat = 36
 
     var body: some View {
@@ -13,7 +13,7 @@ struct WidgetCanvasView: View {
                     .transition(.opacity.combined(with: .scale(scale: 0.97)))
             }
 
-            WidgetGridLayout(layout: layout, spacing: spacing) {
+            WidgetTileLayout(layout: layout, spacing: spacing) {
                 ForEach(layout.widgets) { widget in
                     widgetTileView(widget)
                 }
@@ -25,7 +25,6 @@ struct WidgetCanvasView: View {
     private func widgetTileView(_ widget: WidgetInstance) -> some View {
         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
             .fill(widget.color)
-            .appShadow()
             .transition(.scale(scale: 0.2).combined(with: .opacity))
             .accessibilityElement()
             .accessibilityIdentifier("canvas.tile")
@@ -38,12 +37,23 @@ struct WidgetCanvasView: View {
         .padding()
 }
 
-#Preview("Committed layout") {
+#Preview("Nested layout") {
     let a = WidgetInstance(color: .skyBlue)
     let b = WidgetInstance(color: .hotPink)
-    let c = WidgetInstance(color: .limeGreen)
+    let c = WidgetInstance(color: .vibrantOrange)
+    let d = WidgetInstance(color: .skyBlue)
+    let e = WidgetInstance(color: .limeGreen)
+    let h = WidgetInstance(color: .brightYellow)
 
-    WidgetCanvasView(layout: WidgetCanvasLayout(rows: [[a, b], [c]]))
-        .frame(width: 320, height: 320)
-        .padding()
+    WidgetCanvasView(layout: WidgetCanvasLayout(
+        .row(
+            .widget(a),
+            .column(
+                .widget(b),
+                .row(.widget(c), .widget(d), .widget(e)),
+                .widget(h))
+        )
+    ))
+    .frame(width: 320, height: 320)
+    .padding()
 }
