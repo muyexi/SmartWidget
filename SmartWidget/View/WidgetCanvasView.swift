@@ -9,7 +9,7 @@ struct WidgetCanvasView: View {
     var body: some View {
         ZStack {
             if canvas.isEmpty {
-                WidgetWelcomeView()
+                GreetingView()
                     .transition(.opacity.combined(with: .scale(scale: 0.97)))
             }
 

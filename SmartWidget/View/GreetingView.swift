@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct WidgetWelcomeView: View {
+struct GreetingView: View {
     var body: some View {
         VStack(spacing: 30) {
             Text("👋")
@@ -27,7 +27,7 @@ struct WidgetWelcomeView: View {
 
 #Preview {
     VStack {
-        WidgetWelcomeView()
+        GreetingView()
     }
     .aspectRatio(1.0, contentMode: .fit)
 }
