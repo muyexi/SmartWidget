@@ -13,7 +13,7 @@ struct WidgetCanvasView: View {
                     .transition(.opacity.combined(with: .scale(scale: 0.97)))
             }
 
-            WidgetTileLayout(canvas: canvas, spacing: spacing) {
+            WidgetCanvasLayout(canvas: canvas, spacing: spacing) {
                 ForEach(canvas.widgets) { widget in
                     widgetTileView(widget)
                 }
