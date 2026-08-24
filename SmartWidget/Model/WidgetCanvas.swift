@@ -226,7 +226,6 @@ extension WidgetCanvas {
             let pair: [Node] = edge.comesFirst ? [.widget(widget), node] : [node, .widget(widget)]
 
             return .splitting(pair, along: edge.axis)
-
         case let .container(axis, children):
             let index = childIndex(for: point, along: axis, in: rect, count: children.count)
             // Hit testing uses the ungapped slices, so `slices` cannot fail here.
