@@ -45,14 +45,3 @@ SmartWidget/
 │   └── DraggableWidgetView.swift The drag gesture and its feedback
 └── Extension/                    Colour palette, app shadow
 ```
-
-## Tests
-
-```bash
-xcodebuild test -scheme SmartWidget -destination 'platform=iOS Simulator,name=iPhone 17'
-```
-
-- **28 unit tests** (Swift Testing) in `SmartWidgetTests/`.
-- **6 UI tests** (XCTest) in `SmartWidgetUITests/`.
-
-The unit tests prove the geometry; the UI tests prove a real finger reaches it.
